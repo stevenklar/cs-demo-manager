@@ -1,4 +1,4 @@
-# CS Demo Manager
+# CS Demo Manager - SQLite Version
 
 Companion application for your Counter-Strike demos.
 
