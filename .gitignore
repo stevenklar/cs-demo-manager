@@ -17,3 +17,7 @@ static/csgove
 static/changelog
 build
 !build/Release/*.node
+.claude/
+.omc/
+CLAUDE.md
+bun.lock
