@@ -6,7 +6,7 @@ const createChatMessagesTable: Migration = {
     await transaction.schema
       .createTable('chat_messages')
       .ifNotExists()
-      .addColumn('id', 'bigserial', (col) => col.primaryKey().notNull())
+      .addColumn('id', 'integer', (col) => col.primaryKey().notNull())
       .addColumn('match_checksum', 'varchar', (col) => col.notNull())
       .addForeignKeyConstraint('chat_messages_match_checksum_fk', ['match_checksum'], 'matches', ['checksum'], (cb) =>
         cb.onDelete('cascade'),
@@ -18,7 +18,7 @@ const createChatMessagesTable: Migration = {
       .addColumn('sender_steam_id', 'varchar', (col) => col.notNull())
       .addColumn('sender_name', 'varchar', (col) => col.notNull())
       .addColumn('sender_is_alive', 'boolean', (col) => col.notNull())
-      .addColumn('sender_side', 'int2', (col) => col.notNull())
+      .addColumn('sender_side', 'integer', (col) => col.notNull())
       .execute();
   },
 };

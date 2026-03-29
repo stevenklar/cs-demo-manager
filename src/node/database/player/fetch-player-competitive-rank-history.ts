@@ -2,6 +2,7 @@ import { sql } from 'kysely';
 import { CompetitiveRank } from 'csdm/common/types/counter-strike';
 import type { CompetitiveRankHistory } from 'csdm/common/types/charts/competitive-rank-history';
 import { db } from 'csdm/node/database/database';
+import { dateToISOString } from 'csdm/node/database/date-to-iso-string';
 import type { MatchFilters } from '../match/apply-match-filters';
 
 export async function fetchPlayerCompetitiveRankHistory(
@@ -30,7 +31,7 @@ export async function fetchPlayerCompetitiveRankHistory(
     const rank = row.rank as CompetitiveRank;
     if (lastKnowRank !== rank) {
       rankHistories.push({
-        matchDate: row.date.toISOString(),
+        matchDate: dateToISOString(row.date),
         rank,
         winCount: row.winCount,
         oldRank: lastKnowRank === -1 ? (row.oldRank as CompetitiveRank) : lastKnowRank,

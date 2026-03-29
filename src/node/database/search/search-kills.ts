@@ -1,5 +1,6 @@
 import { sql } from 'kysely';
 import { db } from 'csdm/node/database/database';
+import { dateToISOString } from 'csdm/node/database/date-to-iso-string';
 import { killRowToKill } from '../kills/kill-row-to-kill';
 import type { KillResult } from 'csdm/common/types/search/kill-result';
 import type { SearchFilter } from 'csdm/common/types/search/search-filter';
@@ -170,7 +171,7 @@ export async function searchKills({
         killerSteamId: row.killer_steam_id,
         roundNumber: row.round_number,
         tick: row.tick,
-        date: row.date.toISOString(),
+        date: dateToISOString(row.date),
         mapName: row.map_name,
         side: row.killer_side,
         kills: [killRowToKill(row)],

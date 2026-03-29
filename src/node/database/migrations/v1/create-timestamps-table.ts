@@ -8,7 +8,7 @@ const createTimestampsTable: Migration = {
       .createTable('timestamps')
       .ifNotExists()
       .addColumn('name', 'varchar', (col) => col.notNull().unique().primaryKey())
-      .addColumn('date', 'timestamptz', (col) => col.notNull().defaultTo(sql`now()`))
+      .addColumn('date', 'text', (col) => col.notNull().defaultTo(sql`(datetime('now'))`))
       .execute();
   },
 };

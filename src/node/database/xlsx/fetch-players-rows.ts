@@ -1,6 +1,7 @@
 import { sql } from 'kysely';
 import type { Rank } from 'csdm/common/types/counter-strike';
 import { db } from 'csdm/node/database/database';
+import { dateToISOString } from 'csdm/node/database/date-to-iso-string';
 import { fetchPlayersClutchStats } from '../players/fetch-players-clutch-stats';
 import { fetchLastPlayersData } from '../players/fetch-last-players-data';
 import { fetchPlayersWeaponInspectionsStats } from '../players/fetch-players-weapon-inspections-stats';
@@ -104,9 +105,9 @@ export async function fetchPlayersRows(filters: Filters): Promise<PlayerRow[]> {
     .select(avg<number>('average_damage_per_round').as('averageDamagePerRound'))
     .select(avg<number>('average_kill_per_round').as('averageKillsPerRound'))
     .select(avg<number>('average_death_per_round').as('averageDeathsPerRound'))
-    .select(sql<number>`ROUND(AVG(utility_damage_per_round)::numeric, 1)`.as('averageUtilityDamagePerRound'))
+    .select(sql<number>`ROUND(AVG(utility_damage_per_round), 1)`.as('averageUtilityDamagePerRound'))
     .select(
-      sql<number>`ROUND(SUM("players"."kill_count") / GREATEST(SUM("players"."death_count"), 1)::NUMERIC, 1)`.as(
+      sql<number>`ROUND(CAST(SUM("players"."kill_count") AS REAL) / MAX(SUM("players"."death_count"), 1), 1)`.as(
         'killDeathRatio',
       ),
     )
@@ -149,7 +150,7 @@ export async function fetchPlayersRows(filters: Filters): Promise<PlayerRow[]> {
       gameBanCount: lastData.gameBanCount ?? 0,
       isCommunityBanned: lastData.isCommunityBanned ?? false,
       vacBanCount: lastData.vacBanCount ?? 0,
-      lastBanDate: lastData.lastBanDate?.toISOString() ?? null,
+      lastBanDate: lastData.lastBanDate ? dateToISOString(lastData.lastBanDate) : null,
       vsOneCount: clutchStats?.vsOneCount ?? 0,
       vsOneWonCount: clutchStats?.vsOneWonCount ?? 0,
       vsOneLostCount: clutchStats?.vsOneLostCount ?? 0,

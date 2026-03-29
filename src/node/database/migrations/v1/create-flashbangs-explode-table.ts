@@ -6,7 +6,7 @@ const createFlashbangsExplodeTable: Migration = {
     await transaction.schema
       .createTable('flashbangs_explode')
       .ifNotExists()
-      .addColumn('id', 'bigserial', (col) => col.primaryKey().notNull())
+      .addColumn('id', 'integer', (col) => col.primaryKey().notNull())
       .addColumn('match_checksum', 'varchar', (col) => col.notNull())
       .addForeignKeyConstraint(
         'flashbangs_explode_match_checksum_fk',
@@ -21,17 +21,17 @@ const createFlashbangsExplodeTable: Migration = {
       .addColumn('thrower_steam_id', 'varchar', (col) => col.notNull())
       .addColumn('thrower_name', 'varchar', (col) => col.notNull())
       .addColumn('thrower_team_name', 'varchar', (col) => col.notNull())
-      .addColumn('thrower_side', 'int2', (col) => col.notNull())
-      .addColumn('thrower_velocity_x', 'float8', (col) => col.notNull())
-      .addColumn('thrower_velocity_y', 'float8', (col) => col.notNull())
-      .addColumn('thrower_velocity_z', 'float8', (col) => col.notNull())
-      .addColumn('thrower_yaw', 'float8', (col) => col.notNull())
-      .addColumn('thrower_pitch', 'float8', (col) => col.notNull())
+      .addColumn('thrower_side', 'integer', (col) => col.notNull())
+      .addColumn('thrower_velocity_x', 'real', (col) => col.notNull())
+      .addColumn('thrower_velocity_y', 'real', (col) => col.notNull())
+      .addColumn('thrower_velocity_z', 'real', (col) => col.notNull())
+      .addColumn('thrower_yaw', 'real', (col) => col.notNull())
+      .addColumn('thrower_pitch', 'real', (col) => col.notNull())
       .addColumn('grenade_id', 'varchar', (col) => col.notNull())
       .addColumn('projectile_id', 'varchar', (col) => col.notNull())
-      .addColumn('x', 'float8', (col) => col.notNull())
-      .addColumn('y', 'float8', (col) => col.notNull())
-      .addColumn('z', 'float8', (col) => col.notNull())
+      .addColumn('x', 'real', (col) => col.notNull())
+      .addColumn('y', 'real', (col) => col.notNull())
+      .addColumn('z', 'real', (col) => col.notNull())
       .execute();
 
     await transaction.schema

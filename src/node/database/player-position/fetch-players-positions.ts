@@ -7,7 +7,14 @@ export async function fetchPlayersPositions(checksum: string, roundNumber: numbe
   const rows = await db
     .selectFrom('player_positions as p')
     .leftJoin('steam_account_overrides', 'steam_account_overrides.steam_id', 'p.player_steam_id')
-    .distinctOn(['p.tick', 'p.player_steam_id'])
+    .where('p.id', 'in', (qb) => {
+      return qb
+        .selectFrom('player_positions')
+        .select((eb) => eb.fn.min('id').as('id'))
+        .where('match_checksum', '=', checksum)
+        .where('round_number', '=', roundNumber)
+        .groupBy(['tick', 'player_steam_id']);
+    })
     .select([
       (eb) => {
         return eb.fn.coalesce('steam_account_overrides.name', 'p.player_name').as('player_name');

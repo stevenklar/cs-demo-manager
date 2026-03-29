@@ -7,10 +7,10 @@ export async function searchPlayers({ steamIdOrName, ignoredSteamIds }: PlayersF
   const query = db
     .selectFrom('players')
     .select(['players.steam_id', 'players.name'])
-    .distinctOn(['players.steam_id'])
+    .groupBy(['players.steam_id', 'players.name'])
     .where(({ eb, or, and }) => {
       const filters: Expression<SqlBool>[] = [
-        or([eb('players.steam_id', '=', steamIdOrName), eb('players.name', 'ilike', `%${steamIdOrName}%`)]),
+        or([eb('players.steam_id', '=', steamIdOrName), eb('players.name', 'like', `%${steamIdOrName}%`)]),
       ];
 
       if (ignoredSteamIds.length > 0) {

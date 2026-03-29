@@ -6,6 +6,6 @@ export async function ensureMigrationsTableExists(transaction: Transaction<Datab
     .createTable('migrations')
     .ifNotExists()
     .addColumn('schema_version', 'integer', (col) => col.notNull().unique())
-    .addColumn('run_at', 'timestamptz', (col) => col.notNull())
+    .addColumn('run_at', 'text', (col) => col.notNull())
     .execute();
 }

@@ -5,10 +5,7 @@ export async function fetchBannedAccountAgeStats(ignoreBanBeforeFirstSeen: boole
   let query = db
     .selectFrom('steam_accounts')
     .select([
-      sql<Date | null>`CURRENT_DATE - AVG(AGE(NOW(), creation_date))`.as('average'),
-      sql<Date | null>`CURRENT_DATE - percentile_cont(0.5) WITHIN GROUP (ORDER BY AGE(NOW(), creation_date))`.as(
-        'median',
-      ),
+      sql<string | null>`datetime('now', '-' || CAST(AVG(julianday('now') - julianday(creation_date)) AS INTEGER) || ' days')`.as('average'),
     ])
     .where('steam_accounts.last_ban_date', 'is not', null)
     .where('steam_accounts.creation_date', 'is not', null)
@@ -23,7 +20,7 @@ export async function fetchBannedAccountAgeStats(ignoreBanBeforeFirstSeen: boole
   const result = await query.executeTakeFirst();
 
   return {
-    average: result?.average?.toISOString() ?? null,
-    median: result?.median?.toISOString() ?? null,
+    average: result?.average ?? null,
+    median: null,
   };
 }

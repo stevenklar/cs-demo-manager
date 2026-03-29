@@ -9,6 +9,7 @@ import { fetchPlayerCollateralKillCount } from './fetch-player-collateral-kill-c
 import { fetchPlayerUtilityStats } from './fetch-player-utility-stats';
 import { fetchPlayerOpeningDuelsStats } from './fetch-player-opening-duels-stats';
 import { EconomyBan } from 'csdm/node/steam-web-api/steam-constants';
+import { dateToISOString } from 'csdm/node/database/date-to-iso-string';
 import type { Player } from 'csdm/common/types/player';
 
 async function fetchPlayerRow(steamId: string, filters?: MatchFilters) {
@@ -41,9 +42,9 @@ async function fetchPlayerRow(steamId: string, filters?: MatchFilters) {
       sum<number>('damage_armor').as('damageArmor'),
       sum<number>('utility_damage').as('utilityDamage'),
       avg<number>('headshot_percentage').as('headshotPercentage'),
-      sql<number>`ROUND(AVG(utility_damage_per_round)::numeric, 1)`.as('averageUtilityDamagePerRound'),
+      sql<number>`ROUND(AVG(utility_damage_per_round), 1)`.as('averageUtilityDamagePerRound'),
       avg<number>('kast').as('kast'),
-      sql<number>`SUM(players.kill_count)::NUMERIC / NULLIF(SUM(players.death_count), 0)::NUMERIC`.as('killDeathRatio'),
+      sql<number>`CAST(SUM(players.kill_count) AS REAL) / NULLIF(SUM(players.death_count), 0)`.as('killDeathRatio'),
       avg<number>('hltv_rating').as('hltvRating'),
       avg<number>('hltv_rating_2').as('hltvRating2'),
       avg<number>('average_damage_per_round').as('averageDamagePerRound'),
@@ -150,7 +151,7 @@ export async function fetchPlayer(steamId: string, filters?: MatchFilters): Prom
     economyBan: playerRow.economyBan ?? EconomyBan.None,
     hasPrivateProfile: playerRow.hasPrivateProfile ?? false,
     isCommunityBanned: playerRow.isCommunityBanned ?? false,
-    lastBanDate: playerRow.lastBanDate?.toISOString() ?? null,
+    lastBanDate: playerRow.lastBanDate ? dateToISOString(playerRow.lastBanDate) : null,
     openingDuelsStats: openingDuelsStats.all,
     inspectWeaponCount: playerRow.inspectWeaponCount ?? 0,
     deathWhileInspectingWeaponCount: playerRow.deathWhileInspectingWeaponCount ?? 0,

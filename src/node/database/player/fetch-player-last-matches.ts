@@ -22,7 +22,7 @@ export async function fetchPlayerLastMatches(steamId: string): Promise<LastMatch
       'demos.game',
       'demos.map_name as mapName',
       'matches.winner_name as winnerName',
-      sql<string>`to_char(demos.date, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as('date'),
+      sql<string>`demos.date`.as('date'),
       'players.team_name as focusTeamName',
       'teamA.score as scoreTeamA',
       'teamB.score as scoreTeamB',

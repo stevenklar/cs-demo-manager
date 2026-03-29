@@ -6,7 +6,7 @@ const createChickenPositionsTable: Migration = {
     await transaction.schema
       .createTable('chicken_positions')
       .ifNotExists()
-      .addColumn('id', 'bigserial', (col) => col.primaryKey().notNull())
+      .addColumn('id', 'integer', (col) => col.primaryKey().notNull())
       .addColumn('match_checksum', 'varchar', (col) => col.notNull())
       .addForeignKeyConstraint(
         'chicken_positions_match_checksum_fk',
@@ -18,9 +18,9 @@ const createChickenPositionsTable: Migration = {
       .addColumn('round_number', 'integer', (col) => col.notNull())
       .addColumn('tick', 'integer', (col) => col.notNull())
       .addColumn('frame', 'integer', (col) => col.notNull())
-      .addColumn('x', 'float8', (col) => col.notNull())
-      .addColumn('y', 'float8', (col) => col.notNull())
-      .addColumn('z', 'float8', (col) => col.notNull())
+      .addColumn('x', 'real', (col) => col.notNull())
+      .addColumn('y', 'real', (col) => col.notNull())
+      .addColumn('z', 'real', (col) => col.notNull())
       .execute();
 
     await transaction.schema

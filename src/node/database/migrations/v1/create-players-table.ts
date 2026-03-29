@@ -7,29 +7,29 @@ const createPlayersTable: Migration = {
     await transaction.schema
       .createTable('players')
       .ifNotExists()
-      .addColumn('id', 'bigserial', (col) => col.primaryKey().notNull())
+      .addColumn('id', 'integer', (col) => col.primaryKey().notNull())
       .addColumn('match_checksum', 'varchar', (col) => col.notNull())
       .addForeignKeyConstraint('players_match_checksum_fk', ['match_checksum'], 'matches', ['checksum'], (cb) =>
         cb.onDelete('cascade'),
       )
       .addColumn('steam_id', 'varchar', (col) => col.notNull())
-      .addColumn('index', 'int2', (col) => col.notNull())
+      .addColumn('index', 'integer', (col) => col.notNull())
       .addColumn('team_name', 'varchar', (col) => col.notNull())
       .addColumn('name', 'varchar', (col) => col.notNull())
       .addColumn('kill_count', 'integer', (col) => col.notNull())
       .addColumn('death_count', 'integer', (col) => col.notNull())
       .addColumn('assist_count', 'integer', (col) => col.notNull())
-      .addColumn('kill_death_ratio', 'float4', (col) =>
+      .addColumn('kill_death_ratio', 'real', (col) =>
         col
           .notNull()
-          .generatedAlwaysAs(sql`ROUND(kill_count/GREATEST(death_count,1)::numeric, 2)`)
+          .generatedAlwaysAs(sql`ROUND(CAST(kill_count AS REAL) / MAX(death_count, 1), 2)`)
           .stored(),
       )
       .addColumn('headshot_count', 'integer', (col) => col.notNull())
-      .addColumn('headshot_percentage', 'float4', (col) =>
+      .addColumn('headshot_percentage', 'real', (col) =>
         col
           .notNull()
-          .generatedAlwaysAs(sql`ROUND(headshot_count*100/GREATEST(kill_count,1))`)
+          .generatedAlwaysAs(sql`ROUND(headshot_count * 100.0 / MAX(kill_count, 1))`)
           .stored(),
       )
       .addColumn('damage_health', 'integer', (col) => col.notNull())
@@ -37,10 +37,10 @@ const createPlayersTable: Migration = {
       .addColumn('first_kill_count', 'integer', (col) => col.notNull())
       .addColumn('first_death_count', 'integer', (col) => col.notNull())
       .addColumn('mvp_count', 'integer', (col) => col.notNull())
-      .addColumn('average_damage_per_round', 'float4', (col) => col.notNull())
-      .addColumn('average_kill_per_round', 'float4', (col) => col.notNull())
-      .addColumn('average_death_per_round', 'float4', (col) => col.notNull())
-      .addColumn('utility_damage_per_round', 'float4', (col) => col.notNull())
+      .addColumn('average_damage_per_round', 'real', (col) => col.notNull())
+      .addColumn('average_kill_per_round', 'real', (col) => col.notNull())
+      .addColumn('average_death_per_round', 'real', (col) => col.notNull())
+      .addColumn('utility_damage_per_round', 'real', (col) => col.notNull())
       .addColumn('rank_type', 'integer', (col) => col.notNull())
       .addColumn('rank', 'integer', (col) => col.notNull())
       .addColumn('old_rank', 'integer', (col) => col.notNull())
@@ -49,9 +49,9 @@ const createPlayersTable: Migration = {
       .addColumn('bomb_defused_count', 'integer', (col) => col.notNull())
       .addColumn('hostage_rescued_count', 'integer', (col) => col.notNull())
       .addColumn('score', 'integer', (col) => col.notNull())
-      .addColumn('kast', 'float4', (col) => col.notNull())
-      .addColumn('hltv_rating', 'float4', (col) => col.notNull())
-      .addColumn('hltv_rating_2', 'float4', (col) => col.notNull())
+      .addColumn('kast', 'real', (col) => col.notNull())
+      .addColumn('hltv_rating', 'real', (col) => col.notNull())
+      .addColumn('hltv_rating_2', 'real', (col) => col.notNull())
       .addColumn('utility_damage', 'integer', (col) => col.notNull())
       .addColumn('trade_kill_count', 'integer', (col) => col.notNull())
       .addColumn('trade_death_count', 'integer', (col) => col.notNull())

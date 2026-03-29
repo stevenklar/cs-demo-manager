@@ -1,5 +1,6 @@
 import { sql } from 'kysely';
 import { db } from 'csdm/node/database/database';
+import { dateToISOString } from 'csdm/node/database/date-to-iso-string';
 import type { NinjaDefuseResult } from 'csdm/common/types/search/ninja-defuse-result';
 import { bombDefusedRowToBombDefused } from '../bomb-defused/bomb-defused-row-to-bomb-defused';
 import type { SearchFilter } from 'csdm/common/types/search/search-filter';
@@ -72,7 +73,7 @@ export async function searchNinjaDefuse({
     return {
       ...bombDefusedRowToBombDefused(row),
       mapName: row.map_name,
-      date: row.date.toISOString(),
+      date: dateToISOString(row.date),
       demoPath: row.demo_path,
       game: row.game,
       roundComment: row.comment ?? '',

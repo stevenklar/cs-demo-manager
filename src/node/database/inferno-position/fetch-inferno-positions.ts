@@ -7,9 +7,16 @@ export async function fetchInfernoPositions(checksum: string, roundNumber: numbe
   const rows = await db
     .selectFrom('inferno_positions')
     .selectAll()
-    .distinctOn(['tick', 'unique_id'])
     .where('match_checksum', '=', checksum)
     .where('round_number', '=', roundNumber)
+    .where('id', 'in', (qb) => {
+      return qb
+        .selectFrom('inferno_positions')
+        .select((eb) => eb.fn.min('id').as('id'))
+        .where('match_checksum', '=', checksum)
+        .where('round_number', '=', roundNumber)
+        .groupBy(['tick', 'unique_id']);
+    })
     .orderBy('tick')
     .execute();
   const infernoPositions: InfernoPosition[] = fillMissingTicks(rows.map(infernoPositionRowToInfernoPosition));

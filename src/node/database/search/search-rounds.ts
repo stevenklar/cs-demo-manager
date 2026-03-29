@@ -1,5 +1,6 @@
 import { sql } from 'kysely';
 import { db } from 'csdm/node/database/database';
+import { dateToISOString } from 'csdm/node/database/date-to-iso-string';
 import type { SearchFilter } from 'csdm/common/types/search/search-filter';
 import type { RoundResult } from 'csdm/common/types/search/round-result';
 import { roundRowToRound } from '../rounds/round-row-to-round';
@@ -48,7 +49,7 @@ export async function searchRounds({
       return roundTagsQuery;
     })
     .select(
-      sql<string[] | null>`ARRAY_AGG(DISTINCT round_tags.tag_id) FILTER (WHERE round_tags.tag_id IS NOT NULL)`.as(
+      sql<string | null>`GROUP_CONCAT(DISTINCT CASE WHEN round_tags.tag_id IS NOT NULL THEN round_tags.tag_id END)`.as(
         'tagIds',
       ),
     )
@@ -84,10 +85,11 @@ export async function searchRounds({
   const rows = await query.execute();
 
   const rounds: RoundResult[] = rows.map((row) => {
+    const tagIds = row.tagIds ? row.tagIds.split(',') : [];
     return {
-      ...roundRowToRound(row, row.tagIds ?? []),
+      ...roundRowToRound(row, tagIds),
       mapName: row.map_name,
-      date: row.date.toISOString(),
+      date: dateToISOString(row.date),
       demoPath: row.demo_path,
       game: row.game,
       comment: row.comment ?? '',

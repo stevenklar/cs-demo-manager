@@ -1,5 +1,6 @@
 import type { Match } from 'csdm/common/types/match';
 import type { MatchRow } from 'csdm/node/database/matches/match-table';
+import { dateToISOString } from 'csdm/node/database/date-to-iso-string';
 import { fetchChecksumTagIds } from '../tags/fetch-checksum-tag-ids';
 import type { Team } from '../../../common/types/team';
 import type { CollateralKillPerMatch } from './fetch-collateral-kill-count-per-match';
@@ -24,13 +25,13 @@ export async function matchRowToMatch(
     clientName: row.client_name,
     serverName: row.server_name,
     tickCount: row.tick_count,
-    date: row.date.toISOString(),
+    date: dateToISOString(row.date),
     killCount: row.kill_count,
     assistCount: row.assist_count,
     deathCount: row.death_count,
     collateralKillCount: collateralKillCountPerMatch[row.checksum] ?? 0,
     duration: row.duration,
-    analyzeDate: row.analyze_date.toISOString(),
+    analyzeDate: dateToISOString(row.analyze_date),
     shotCount: row.shot_count,
     winnerName: row.winner_name,
     winnerSide: row.winner_side,

@@ -6,7 +6,7 @@ const createClutchesTable: Migration = {
     await transaction.schema
       .createTable('clutches')
       .ifNotExists()
-      .addColumn('id', 'bigserial', (col) => col.primaryKey().notNull())
+      .addColumn('id', 'integer', (col) => col.primaryKey().notNull())
       .addColumn('match_checksum', 'varchar', (col) => col.notNull())
       .addForeignKeyConstraint('clutches_match_checksum_fk', ['match_checksum'], 'matches', ['checksum'], (cb) =>
         cb.onDelete('cascade'),
@@ -17,7 +17,7 @@ const createClutchesTable: Migration = {
       .addColumn('clutcher_name', 'varchar', (col) => col.notNull())
       .addColumn('clutcher_steam_id', 'varchar', (col) => col.notNull())
       .addColumn('won', 'boolean', (col) => col.notNull())
-      .addColumn('side', 'int2', (col) => col.notNull())
+      .addColumn('side', 'integer', (col) => col.notNull())
       .addColumn('opponent_count', 'integer', (col) => col.notNull())
       .addColumn('has_clutcher_survived', 'boolean', (col) => col.notNull())
       .addColumn('clutcher_kill_count', 'integer', (col) => col.notNull())

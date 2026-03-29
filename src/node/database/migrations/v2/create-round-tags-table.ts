@@ -8,7 +8,7 @@ const createRoundTagsTable: Migration = {
       .ifNotExists()
       .addColumn('checksum', 'varchar', (col) => col.notNull())
       .addColumn('round_number', 'integer', (col) => col.notNull())
-      .addColumn('tag_id', 'int8', (col) => col.notNull())
+      .addColumn('tag_id', 'integer', (col) => col.notNull())
       .addUniqueConstraint('round_tags_checksum_round_number_tag_id_unique', ['checksum', 'round_number', 'tag_id'])
       .execute();
   },

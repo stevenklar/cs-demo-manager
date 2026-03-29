@@ -1,5 +1,6 @@
 import { sql } from 'kysely';
 import { db } from 'csdm/node/database/database';
+import { dateToISOString } from 'csdm/node/database/date-to-iso-string';
 import { fetchCollateralKillCountPerSteamId } from '../player/fetch-collateral-kill-count-per-steam-ids';
 import { fetchPlayersClutchStats } from '../players/fetch-players-clutch-stats';
 import { fetchPlayersTagIds } from '../tags/fetch-players-tag-ids';
@@ -76,17 +77,17 @@ export async function fetchMatchPlayers(checksum: string): Promise<MatchPlayer[]
       });
     })
     .select(
-      sql<number>`COUNT(kills.id) FILTER (WHERE kills.penetrated_objects > 0 AND kills.killer_steam_id = players.steam_id)`.as(
+      sql<number>`SUM(CASE WHEN kills.penetrated_objects > 0 AND kills.killer_steam_id = players.steam_id THEN 1 ELSE 0 END)`.as(
         'wallbangKillCount',
       ),
     )
     .select(
-      sql<number>`COUNT(kills.id) FILTER (WHERE kills.is_no_scope = true AND kills.killer_steam_id = players.steam_id)`.as(
+      sql<number>`SUM(CASE WHEN kills.is_no_scope = true AND kills.killer_steam_id = players.steam_id THEN 1 ELSE 0 END)`.as(
         'noScopeKillCount',
       ),
     )
     .select(
-      sql<number>`COUNT(kills.id) FILTER (WHERE kills.is_victim_inspecting_weapon = true AND kills.victim_steam_id = players.steam_id)`.as(
+      sql<number>`SUM(CASE WHEN kills.is_victim_inspecting_weapon = true AND kills.victim_steam_id = players.steam_id THEN 1 ELSE 0 END)`.as(
         'deathWhileInspectingWeaponCount',
       ),
     )
@@ -114,7 +115,7 @@ export async function fetchMatchPlayers(checksum: string): Promise<MatchPlayer[]
     return {
       ...row,
       collateralKillCount: collateralKillCountPerSteamId[row.steamId] ?? 0,
-      lastBanDate: row.last_ban_date?.toISOString() ?? null,
+      lastBanDate: row.last_ban_date ? dateToISOString(row.last_ban_date) : null,
       vsOneCount: clutchStats?.vsOneCount ?? 0,
       vsOneWonCount: clutchStats?.vsOneWonCount ?? 0,
       vsOneLostCount: clutchStats?.vsOneLostCount ?? 0,

@@ -1,12 +1,25 @@
 import { sql } from 'kysely';
-import { getSettings } from '../settings/get-settings';
 import { db } from './database';
 
 export async function getDatabaseSize(): Promise<string> {
-  const settings = await getSettings();
-  const { database } = settings;
-  const query = sql<{ size: string }>`select pg_size_pretty(pg_database_size(${database.database})) as size`;
-  const { rows } = await query.execute(db);
+  const pageCountResult = await sql<{ page_count: number }>`PRAGMA page_count`.execute(db);
+  const pageSizeResult = await sql<{ page_size: number }>`PRAGMA page_size`.execute(db);
 
-  return rows.length > 0 ? rows[0].size : '0 MB';
+  const pageCount = pageCountResult.rows[0]?.page_count ?? 0;
+  const pageSize = pageSizeResult.rows[0]?.page_size ?? 0;
+  const sizeInBytes = pageCount * pageSize;
+
+  if (sizeInBytes < 1024) {
+    return `${sizeInBytes} bytes`;
+  }
+
+  if (sizeInBytes < 1024 * 1024) {
+    return `${(sizeInBytes / 1024).toFixed(1)} KB`;
+  }
+
+  if (sizeInBytes < 1024 * 1024 * 1024) {
+    return `${(sizeInBytes / (1024 * 1024)).toFixed(1)} MB`;
+  }
+
+  return `${(sizeInBytes / (1024 * 1024 * 1024)).toFixed(2)} GB`;
 }

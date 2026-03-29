@@ -1,4 +1,5 @@
 import { db } from 'csdm/node/database/database';
+import { dateToISOString } from 'csdm/node/database/date-to-iso-string';
 import type { IgnoredSteamAccount } from '../../../common/types/ignored-steam-account';
 
 export async function fetchIgnoredSteamAccounts(steamIds?: string[]): Promise<IgnoredSteamAccount[]> {
@@ -23,7 +24,7 @@ export async function fetchIgnoredSteamAccounts(steamIds?: string[]): Promise<Ig
       steamId: row.steam_id,
       name: row.name,
       avatar: row.avatar,
-      lastBanDate: row.last_ban_date?.toISOString() ?? null,
+      lastBanDate: row.last_ban_date ? dateToISOString(row.last_ban_date) : null,
     };
   });
 

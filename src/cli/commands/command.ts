@@ -2,6 +2,7 @@ import { type ParseArgsOptionsConfig } from 'node:util';
 import { getSettings } from 'csdm/node/settings/get-settings';
 import { createDatabaseConnection } from 'csdm/node/database/database';
 import { migrateDatabase } from 'csdm/node/database/migrations/migrate-database';
+import { getDefaultDatabasePath } from 'csdm/node/database/connect-database';
 
 export abstract class Command {
   public abstract getDescription(): string;
@@ -33,7 +34,8 @@ export abstract class Command {
 
   protected async initDatabaseConnection() {
     const settings = await getSettings();
-    createDatabaseConnection(settings.database);
+    const databasePath = settings.database.databasePath || getDefaultDatabasePath();
+    createDatabaseConnection(databasePath);
     await migrateDatabase();
   }
 

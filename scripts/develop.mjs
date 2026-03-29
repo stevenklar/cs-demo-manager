@@ -110,7 +110,7 @@ async function buildWebSocketProcessBundle() {
     target: `node${node}`,
     metafile: true,
     external: [
-      'pg-native',
+      'better-sqlite3',
       '@aws-sdk/client-s3', // the unzipper module has it as a dev dependency
     ],
     define: {

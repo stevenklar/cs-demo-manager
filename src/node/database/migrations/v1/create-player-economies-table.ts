@@ -6,7 +6,7 @@ const createPlayerEconomiesTable: Migration = {
     await transaction.schema
       .createTable('player_economies')
       .ifNotExists()
-      .addColumn('id', 'bigserial', (col) => col.primaryKey().notNull())
+      .addColumn('id', 'integer', (col) => col.primaryKey().notNull())
       .addColumn('match_checksum', 'varchar', (col) => col.notNull())
       .addForeignKeyConstraint(
         'player_economies_match_checksum_fk',
@@ -18,7 +18,7 @@ const createPlayerEconomiesTable: Migration = {
       .addColumn('round_number', 'integer', (col) => col.notNull())
       .addColumn('player_steam_id', 'varchar', (col) => col.notNull())
       .addColumn('player_name', 'varchar', (col) => col.notNull())
-      .addColumn('player_side', 'int2', (col) => col.defaultTo(null))
+      .addColumn('player_side', 'integer', (col) => col.defaultTo(null))
       .addColumn('start_money', 'integer', (col) => col.notNull())
       .addColumn('money_spent', 'integer', (col) => col.notNull())
       .addColumn('equipment_value', 'integer', (col) => col.notNull())

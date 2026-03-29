@@ -6,9 +6,16 @@ export async function fetchChickenPositions(checksum: string, roundNumber: numbe
   const rows = await db
     .selectFrom('chicken_positions')
     .selectAll()
-    .distinctOn(['tick', 'x', 'y', 'z'])
     .where('match_checksum', '=', checksum)
     .where('round_number', '=', roundNumber)
+    .where('id', 'in', (qb) => {
+      return qb
+        .selectFrom('chicken_positions')
+        .select((eb) => eb.fn.min('id').as('id'))
+        .where('match_checksum', '=', checksum)
+        .where('round_number', '=', roundNumber)
+        .groupBy(['tick', 'x', 'y', 'z']);
+    })
     .orderBy('tick')
     .execute();
 

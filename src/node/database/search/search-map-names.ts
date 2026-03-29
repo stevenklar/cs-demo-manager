@@ -7,9 +7,9 @@ export async function searchMapNames({ name, ignoredNames }: MapNamesFilter) {
     .selectFrom('demos')
     .innerJoin('matches', 'matches.checksum', 'demos.checksum')
     .select(['demos.map_name'])
-    .distinctOn(['demos.map_name'])
+    .groupBy(['demos.map_name'])
     .where(({ eb, or, and }) => {
-      const filters: Expression<SqlBool>[] = [or([eb('demos.map_name', 'ilike', `%${name}%`)])];
+      const filters: Expression<SqlBool>[] = [or([eb('demos.map_name', 'like', `%${name}%`)])];
 
       if (ignoredNames.length > 0) {
         filters.push(eb('demos.map_name', 'not in', ignoredNames));

@@ -6,7 +6,7 @@ const createRoundsTable: Migration = {
     await transaction.schema
       .createTable('rounds')
       .ifNotExists()
-      .addColumn('id', 'bigserial', (col) => col.primaryKey().notNull())
+      .addColumn('id', 'integer', (col) => col.primaryKey().notNull())
       .addColumn('match_checksum', 'varchar', (col) => col.notNull())
       .addForeignKeyConstraint('rounds_match_checksum_fk', ['match_checksum'], 'matches', ['checksum'], (cb) =>
         cb.onDelete('cascade'),
@@ -24,8 +24,8 @@ const createRoundsTable: Migration = {
       .addColumn('team_b_name', 'varchar', (col) => col.notNull())
       .addColumn('team_a_score', 'integer', (col) => col.notNull())
       .addColumn('team_b_score', 'integer', (col) => col.notNull())
-      .addColumn('team_a_side', 'int2', (col) => col.notNull())
-      .addColumn('team_b_side', 'int2', (col) => col.notNull())
+      .addColumn('team_a_side', 'integer', (col) => col.notNull())
+      .addColumn('team_b_side', 'integer', (col) => col.notNull())
       .addColumn('team_a_start_money', 'integer', (col) => col.notNull())
       .addColumn('team_b_start_money', 'integer', (col) => col.notNull())
       .addColumn('team_a_equipment_value', 'integer', (col) => col.notNull())
@@ -35,9 +35,9 @@ const createRoundsTable: Migration = {
       .addColumn('team_a_economy_type', 'varchar', (col) => col.notNull())
       .addColumn('team_b_economy_type', 'varchar', (col) => col.notNull())
       .addColumn('duration', 'integer', (col) => col.notNull())
-      .addColumn('end_reason', 'int2', (col) => col.notNull())
+      .addColumn('end_reason', 'integer', (col) => col.notNull())
       .addColumn('winner_name', 'varchar', (col) => col.notNull())
-      .addColumn('winner_side', 'int2', (col) => col.notNull())
+      .addColumn('winner_side', 'integer', (col) => col.notNull())
       .addColumn('overtime_number', 'integer', (col) => col.notNull().defaultTo(0))
       .execute();
   },

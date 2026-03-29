@@ -1,22 +1,19 @@
 import React from 'react';
-import { PortInput } from '../../components/inputs/port-input';
-import { DatabaseNameInput } from '../../components/inputs/database-name-input';
-import { UsernameInput } from '../../components/inputs/username-input';
-import { PasswordInput } from '../../components/inputs/password-input';
+import { Trans } from '@lingui/react/macro';
 import { DisconnectDatabaseButton } from './disconnect-database-button';
 import { useDatabaseSettings } from './use-database-settings';
-import { HostnameInput } from 'csdm/ui/components/inputs/hostname-input';
 
 export function Database() {
-  const { hostname, port, username, password, database } = useDatabaseSettings();
+  const { databasePath } = useDatabaseSettings();
 
   return (
-    <div className="flex max-w-[264px] flex-col gap-y-8">
-      <HostnameInput hostname={hostname} />
-      <DatabaseNameInput databaseName={database} />
-      <UsernameInput username={username} />
-      <PasswordInput password={password} />
-      <PortInput port={port} />
+    <div className="flex max-w-[400px] flex-col gap-y-8">
+      <div>
+        <p className="text-body-strong">
+          <Trans>Database path</Trans>
+        </p>
+        <p className="mt-4 select-text break-all">{databasePath || <Trans>Default location</Trans>}</p>
+      </div>
       <div className="mt-12">
         <DisconnectDatabaseButton />
       </div>

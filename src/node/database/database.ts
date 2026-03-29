@@ -1,42 +1,67 @@
-import { types, Pool } from 'pg';
+import Database from 'better-sqlite3';
 import type { KyselyConfig, LogEvent, Logger } from 'kysely';
-import { Kysely, PostgresDialect } from 'kysely';
-import type { DatabaseSettings } from 'csdm/node/settings/settings';
-import type { Database } from './schema';
+import { Kysely, SqliteDialect } from 'kysely';
+import type { Database as DatabaseSchema } from './schema';
 
-export let db: Kysely<Database>;
+export let db: Kysely<DatabaseSchema>;
+export let sqliteDb: Database.Database;
 
-// Convert int8 values that are "safe" JS integers into Numbers otherwise leave them as strings.
-// Postgres returns int8 values for int8 columns but also aggregate functions (COUNT(), SUM()...).
-// By default node-pg parses int8 values into strings.
-// We do this conversion for the following reasons:
-// - The only int8 columns in the app are used for tables PK ID and we don't do Math operations on them.
-// - To not have to think about casting values into numbers when using aggregate functions, i.e.:
-//   db.count('id') vs db.raw('COUNT(id)::INT')
-// - Sending BigInts through WebSocket result in strings.
-types.setTypeParser(types.builtins.INT8, (value) => {
-  const valueAsNumber = Number(value);
-  if (Number.isSafeInteger(valueAsNumber)) {
-    return valueAsNumber;
+function serializeValue(value: unknown): unknown {
+  if (value instanceof Date) {
+    return value.toISOString();
   }
-
+  if (typeof value === 'boolean') {
+    return value ? 1 : 0;
+  }
   return value;
-});
-// Cast numeric types into JS Number so SUM, AVG... will be numbers instead of strings.
-types.setTypeParser(types.builtins.NUMERIC, Number);
-types.setTypeParser(types.builtins.INT4, Number);
-types.setTypeParser(types.builtins.INT2, Number);
+}
 
-export function createDatabaseConnection(settings: DatabaseSettings) {
-  const dialect = new PostgresDialect({
-    pool: new Pool({
-      host: settings.hostname,
-      port: settings.port,
-      user: settings.username,
-      password: settings.password,
-      database: settings.database,
-      connectionTimeoutMillis: 10000,
-    }),
+function serializeArgs(args: unknown[]): unknown[] {
+  return args.map((arg) => {
+    if (Array.isArray(arg)) {
+      return arg.map(serializeValue);
+    }
+    return serializeValue(arg);
+  });
+}
+
+function createSerializingProxy(database: Database.Database): Database.Database {
+  return new Proxy(database, {
+    get(target, prop, receiver) {
+      if (prop === 'prepare') {
+        return (source: string) => {
+          const stmt = target.prepare(source);
+          return new Proxy(stmt, {
+            get(stmtTarget, stmtProp, stmtReceiver) {
+              const value = Reflect.get(stmtTarget, stmtProp, stmtReceiver);
+              if (typeof value === 'function' && (stmtProp === 'run' || stmtProp === 'get' || stmtProp === 'all')) {
+                return (...args: unknown[]) => {
+                  return value.apply(stmtTarget, serializeArgs(args));
+                };
+              }
+              return value;
+            },
+          });
+        };
+      }
+      return Reflect.get(target, prop, receiver);
+    },
+  });
+}
+
+export function createDatabaseConnection(databasePath: string) {
+  const sqlite = new Database(databasePath);
+
+  sqlite.pragma('journal_mode = WAL');
+  sqlite.pragma('synchronous = NORMAL');
+  sqlite.pragma('foreign_keys = ON');
+  sqlite.pragma('cache_size = -64000');
+  sqlite.pragma('temp_store = MEMORY');
+
+  sqliteDb = sqlite;
+
+  const dialect = new SqliteDialect({
+    database: createSerializingProxy(sqlite),
   });
 
   let loggerFunction: Logger;
@@ -63,5 +88,9 @@ export function createDatabaseConnection(settings: DatabaseSettings) {
     log: loggerFunction,
   };
 
-  db = new Kysely<Database>(config);
+  db = new Kysely<DatabaseSchema>(config);
+}
+
+export function closeDatabaseConnection() {
+  sqliteDb?.close();
 }

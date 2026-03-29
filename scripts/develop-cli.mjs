@@ -24,7 +24,6 @@ const context = await esbuild.context({
     'process.env.FACEIT_API_KEY': `"${process.env.FACEIT_API_KEY}"`,
   },
   external: [
-    'pg-native',
     '@aws-sdk/client-s3', // the unzipper module has it as a dev dependency
   ],
   alias: {

@@ -9,9 +9,10 @@ const v12: Migration = {
 
     // The "player_ban_per_match" view (created in the v1 migration) depends on the "date" column in the matches table.
     // Since we are going to remove that column, we must first recreate the view to use the "date" column from the demos table instead.
+    await sql`DROP VIEW IF EXISTS player_ban_per_match`.execute(transaction);
+
     await transaction.schema
       .createView('player_ban_per_match')
-      .orReplace()
       .as(
         transaction
           .with('match_steam_ids_with_date', (qb) => {
@@ -36,24 +37,28 @@ const v12: Migration = {
       )
       .execute();
 
-    await transaction.schema
-      .alterTable('matches')
-      .dropColumn('name')
-      .dropColumn('game')
-      .dropColumn('source')
-      .dropColumn('type')
-      .dropColumn('date')
-      .dropColumn('map_name')
-      .dropColumn('tick_count')
-      .dropColumn('tickrate')
-      .dropColumn('framerate')
-      .dropColumn('duration')
-      .dropColumn('server_name')
-      .dropColumn('client_name')
-      .dropColumn('network_protocol')
-      .dropColumn('build_number')
-      .dropColumn('share_code')
-      .execute();
+    // SQLite requires dropping columns one at a time
+    const columnsToDrop = [
+      'name',
+      'game',
+      'source',
+      'type',
+      'date',
+      'map_name',
+      'tick_count',
+      'tickrate',
+      'framerate',
+      'duration',
+      'server_name',
+      'client_name',
+      'network_protocol',
+      'build_number',
+      'share_code',
+    ];
+
+    for (const column of columnsToDrop) {
+      await transaction.schema.alterTable('matches').dropColumn(column).execute();
+    }
   },
 };
 

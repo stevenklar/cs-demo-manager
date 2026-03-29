@@ -1,5 +1,6 @@
 import { sql } from 'kysely';
 import { db } from 'csdm/node/database/database';
+import { dateToISOString } from 'csdm/node/database/date-to-iso-string';
 import { clutchRowToClutch } from '../clutches/clutch-row-to-clutch';
 import type { SearchFilter } from 'csdm/common/types/search/search-filter';
 import type { ClutchResult } from 'csdm/common/types/search/clutch-result';
@@ -83,7 +84,7 @@ export async function searchClutches({
     return {
       ...clutchRowToClutch(row),
       mapName: row.map_name,
-      date: row.date.toISOString(),
+      date: dateToISOString(row.date),
       demoPath: row.demo_path,
       game: row.game,
       roundComment: row.comment ?? '',

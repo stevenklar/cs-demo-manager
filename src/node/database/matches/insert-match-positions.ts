@@ -1,4 +1,3 @@
-import type { DatabaseSettings } from 'csdm/node/settings/settings';
 import type { PlayerPositionTable } from '../player-position/player-position-table';
 import type { GrenadePositionTable } from '../grenade-position/grenade-position-table';
 import type { InfernoPositionTable } from '../inferno-position/inferno-position-table';
@@ -6,11 +5,10 @@ import type { HostagePositionTable } from '../hostage-position/hostage-position-
 import type { ChickenPositionTable } from '../chicken-position/chicken-position-table';
 import { getCsvFilePath, insertFromCsv, type InsertOptions } from './match-insertion';
 
-async function insertPlayersPositions({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertPlayersPositions({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_positions.csv');
 
   await insertFromCsv<PlayerPositionTable>({
-    databaseSettings,
     csvFilePath,
     tableName: 'player_positions',
     columns: [
@@ -50,11 +48,10 @@ async function insertPlayersPositions({ outputFolderPath, demoName, databaseSett
   });
 }
 
-async function insertGrenadePositions({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertGrenadePositions({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_grenade_positions.csv');
 
   await insertFromCsv<GrenadePositionTable>({
-    databaseSettings,
     tableName: 'grenade_positions',
     csvFilePath,
     columns: [
@@ -81,11 +78,10 @@ async function insertGrenadePositions({ outputFolderPath, demoName, databaseSett
   });
 }
 
-async function insertInfernoPositions({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertInfernoPositions({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_inferno_positions.csv');
 
   await insertFromCsv<InfernoPositionTable>({
-    databaseSettings,
     tableName: 'inferno_positions',
     csvFilePath,
     columns: [
@@ -104,64 +100,31 @@ async function insertInfernoPositions({ outputFolderPath, demoName, databaseSett
   });
 }
 
-async function insertHostagePositions({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertHostagePositions({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_hostage_positions.csv');
 
   await insertFromCsv<HostagePositionTable>({
-    databaseSettings,
     tableName: 'hostage_positions',
     csvFilePath,
     columns: ['frame', 'tick', 'round_number', 'x', 'y', 'z', 'state', 'match_checksum'],
   });
 }
 
-async function insertChickenPositions({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertChickenPositions({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_chicken_positions.csv');
 
   await insertFromCsv<ChickenPositionTable>({
-    databaseSettings,
     tableName: 'chicken_positions',
     csvFilePath,
     columns: ['frame', 'tick', 'round_number', 'x', 'y', 'z', 'match_checksum'],
   });
 }
 
-type InsertMatchPositionsParameters = {
-  databaseSettings: DatabaseSettings;
-  demoName: string;
-  outputFolderPath: string;
-};
-
-export async function insertMatchPositions({
-  demoName,
-  outputFolderPath,
-  databaseSettings,
-}: InsertMatchPositionsParameters) {
-  await Promise.all([
-    insertPlayersPositions({
-      databaseSettings,
-      outputFolderPath,
-      demoName,
-    }),
-    insertGrenadePositions({
-      databaseSettings,
-      outputFolderPath,
-      demoName,
-    }),
-    insertInfernoPositions({
-      databaseSettings,
-      outputFolderPath,
-      demoName,
-    }),
-    insertHostagePositions({
-      databaseSettings,
-      outputFolderPath,
-      demoName,
-    }),
-    insertChickenPositions({
-      databaseSettings,
-      outputFolderPath,
-      demoName,
-    }),
-  ]);
+export async function insertMatchPositions({ demoName, outputFolderPath }: InsertOptions) {
+  // With SQLite, inserts are sequential (single-writer model)
+  await insertPlayersPositions({ outputFolderPath, demoName });
+  await insertGrenadePositions({ outputFolderPath, demoName });
+  await insertInfernoPositions({ outputFolderPath, demoName });
+  await insertHostagePositions({ outputFolderPath, demoName });
+  await insertChickenPositions({ outputFolderPath, demoName });
 }

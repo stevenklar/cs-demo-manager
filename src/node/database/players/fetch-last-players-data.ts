@@ -42,7 +42,7 @@ export async function fetchLastPlayersData(steamIds: string[]): Promise<LastPlay
     ])
     .innerJoin('demos', 'demos.checksum', 'players.match_checksum')
     .select(['demos.date as lastMatchDate', 'demos.game as game'])
-    .where((eb) => eb('players.steam_id', '=', eb.fn.any(eb.val(steamIds))))
+    .where('players.steam_id', 'in', steamIds)
     .groupBy([
       'demos.checksum',
       'players.steam_id',

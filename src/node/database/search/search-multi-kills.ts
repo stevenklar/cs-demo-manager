@@ -1,5 +1,6 @@
 import { sql } from 'kysely';
 import { db } from 'csdm/node/database/database';
+import { dateToISOString } from 'csdm/node/database/date-to-iso-string';
 import { killRowToKill } from '../kills/kill-row-to-kill';
 import type { MultiKillResult } from 'csdm/common/types/search/multi-kill-result';
 import type { SearchFilter } from 'csdm/common/types/search/search-filter';
@@ -138,7 +139,7 @@ export async function searchMultiKills({
         killerSteamId: kill.killer_steam_id,
         roundNumber: kill.round_number,
         tick: kill.tick,
-        date: kill.date.toISOString(),
+        date: dateToISOString(kill.date),
         mapName: kill.map_name,
         side: kill.killer_side,
         kills: [killRowToKill(kill)],

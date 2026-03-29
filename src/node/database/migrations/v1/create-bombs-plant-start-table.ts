@@ -6,7 +6,7 @@ const createBombsPlantStartTable: Migration = {
     await transaction.schema
       .createTable('bombs_plant_start')
       .ifNotExists()
-      .addColumn('id', 'bigserial', (col) => col.primaryKey().notNull())
+      .addColumn('id', 'integer', (col) => col.primaryKey().notNull())
       .addColumn('match_checksum', 'varchar', (col) => col.notNull())
       .addForeignKeyConstraint(
         'bombs_plant_start_match_checksum_fk',
@@ -22,9 +22,9 @@ const createBombsPlantStartTable: Migration = {
       .addColumn('planter_steam_id', 'varchar', (col) => col.notNull())
       .addColumn('planter_name', 'varchar', (col) => col.notNull())
       .addColumn('is_planter_controlling_bot', 'boolean', (col) => col.notNull())
-      .addColumn('x', 'float8', (col) => col.notNull())
-      .addColumn('y', 'float8', (col) => col.notNull())
-      .addColumn('z', 'float8', (col) => col.notNull())
+      .addColumn('x', 'real', (col) => col.notNull())
+      .addColumn('y', 'real', (col) => col.notNull())
+      .addColumn('z', 'real', (col) => col.notNull())
       .execute();
   },
 };

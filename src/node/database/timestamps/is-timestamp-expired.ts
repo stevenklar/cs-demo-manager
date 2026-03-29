@@ -14,5 +14,7 @@ export async function isTimestampExpired(
   const oneDayInMilliseconds = 3600 * 24 * 1000;
   const expirationTime = expirationTimeInMilliseconds ?? oneDayInMilliseconds;
 
-  return Date.now() - timestamp.date.getTime() >= expirationTime;
+  const dateValue = typeof timestamp.date === 'string' ? new Date(timestamp.date).getTime() : timestamp.date.getTime();
+
+  return Date.now() - dateValue >= expirationTime;
 }

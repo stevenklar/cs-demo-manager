@@ -26,7 +26,7 @@ export async function optimizeDatabaseHandler({
 
     if (clearPositions) {
       await deletePositions();
-      await sql`VACUUM FULL`.execute(db);
+      await sql`VACUUM`.execute(db);
     }
 
     server.sendMessageToRendererProcess({

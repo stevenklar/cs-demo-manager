@@ -6,7 +6,7 @@ const createPlayerPositionsTable: Migration = {
     await transaction.schema
       .createTable('player_positions')
       .ifNotExists()
-      .addColumn('id', 'bigserial', (col) => col.primaryKey().notNull())
+      .addColumn('id', 'integer', (col) => col.primaryKey().notNull())
       .addColumn('match_checksum', 'varchar', (col) => col.notNull())
       .addForeignKeyConstraint(
         'player_positions_match_checksum_fk',
@@ -21,12 +21,12 @@ const createPlayerPositionsTable: Migration = {
       .addColumn('player_steam_id', 'varchar', (col) => col.notNull())
       .addColumn('player_name', 'varchar', (col) => col.notNull())
       .addColumn('is_alive', 'boolean', (col) => col.notNull())
-      .addColumn('x', 'float8', (col) => col.notNull())
-      .addColumn('y', 'float8', (col) => col.notNull())
-      .addColumn('z', 'float8', (col) => col.notNull())
-      .addColumn('yaw', 'float8', (col) => col.notNull())
-      .addColumn('flash_duration_remaining', 'float8', (col) => col.notNull())
-      .addColumn('side', 'int2', (col) => col.notNull())
+      .addColumn('x', 'real', (col) => col.notNull())
+      .addColumn('y', 'real', (col) => col.notNull())
+      .addColumn('z', 'real', (col) => col.notNull())
+      .addColumn('yaw', 'real', (col) => col.notNull())
+      .addColumn('flash_duration_remaining', 'real', (col) => col.notNull())
+      .addColumn('side', 'integer', (col) => col.notNull())
       .addColumn('health', 'integer', (col) => col.notNull())
       .addColumn('money', 'integer', (col) => col.notNull())
       .addColumn('armor', 'integer', (col) => col.notNull())

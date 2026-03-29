@@ -8,7 +8,7 @@ const v4: Migration = {
       .createTable('steam_account_tags')
       .ifNotExists()
       .addColumn('steam_id', 'varchar', (col) => col.notNull())
-      .addColumn('tag_id', 'int8', (col) => col.notNull())
+      .addColumn('tag_id', 'integer', (col) => col.notNull())
       .addUniqueConstraint('steam_account_tags_steam_id_tag_id_unique', ['steam_id', 'tag_id'])
       .execute();
 

@@ -13,14 +13,14 @@ export async function fetchPlayerChartsData(steamId: string, filters: MatchFilte
     ])
     .innerJoin('matches', 'matches.checksum', 'players.match_checksum')
     .innerJoin('demos', 'demos.checksum', 'matches.checksum')
-    .select(sql<string>`to_char(demos.date, 'YYYY-MM-DD"T"HH24:MI:SS.MS"Z"')`.as('matchDate'))
+    .select(sql<string>`demos.date`.as('matchDate'))
     .leftJoin('clutches', function (qb) {
       return qb
         .onRef('clutches.match_checksum', '=', 'players.match_checksum')
         .onRef('players.steam_id', '=', 'clutches.clutcher_steam_id');
     })
     .select([
-      sql<number>`ROUND(COUNT(clutches.id) FILTER (WHERE clutches.won = TRUE) * 100.0 / GREATEST(COUNT(clutches.id), 1), 1)::numeric`.as(
+      sql<number>`ROUND(SUM(CASE WHEN clutches.won = TRUE THEN 1 ELSE 0 END) * 100.0 / MAX(COUNT(clutches.id), 1), 1)`.as(
         'clutchWonPercentage',
       ),
     ])

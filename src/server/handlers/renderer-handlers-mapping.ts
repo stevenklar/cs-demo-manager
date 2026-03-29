@@ -89,7 +89,6 @@ import { isCounterStrikeRunningHandler } from './renderer-process/counter-strike
 import type { MatchHeatmapFilter, PlayerHeatmapFilter, TeamHeatmapFilter } from 'csdm/common/types/heatmap-filters';
 import type { Demo } from 'csdm/common/types/demo';
 import type { Map } from 'csdm/common/types/map';
-import type { DatabaseSettings } from 'csdm/node/settings/settings';
 import type { Tag } from 'csdm/common/types/tag';
 import type { Handler } from 'csdm/server/handler';
 import { resetMapsHandler } from './renderer-process/map/reset-maps-handler';
@@ -285,7 +284,7 @@ export interface RendererMessageHandlers {
   [RendererClientMessageName.DeleteCamera]: Handler<string>;
   [RendererClientMessageName.FetchBanStats]: Handler<void, BanStats>;
   [RendererClientMessageName.DisconnectDatabase]: Handler;
-  [RendererClientMessageName.ConnectDatabase]: Handler<DatabaseSettings | undefined, ConnectDatabaseError | undefined>;
+  [RendererClientMessageName.ConnectDatabase]: Handler<string | undefined, ConnectDatabaseError | undefined>;
   [RendererClientMessageName.AddVideoToQueue]: Handler<AddVideoPayload>;
   [RendererClientMessageName.ResumeVideoQueue]: Handler;
   [RendererClientMessageName.PauseVideoQueue]: Handler;

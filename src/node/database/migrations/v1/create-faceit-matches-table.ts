@@ -8,7 +8,7 @@ const createFaceitMatchesTable: Migration = {
       .ifNotExists()
       .addColumn('id', 'varchar', (col) => col.notNull().unique().primaryKey())
       .addColumn('game', 'varchar', (col) => col.notNull())
-      .addColumn('date', 'timestamptz', (col) => col.notNull())
+      .addColumn('date', 'text', (col) => col.notNull())
       .addColumn('duration_in_seconds', 'integer', (col) => col.notNull())
       .addColumn('demo_url', 'varchar', (col) => col.notNull())
       .addColumn('map_name', 'varchar', (col) => col.notNull())

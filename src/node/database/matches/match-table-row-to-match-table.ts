@@ -1,5 +1,6 @@
 import type { MatchTable, MatchTablePlayer } from 'csdm/common/types/match-table';
 import type { MatchTableRow } from 'csdm/node/database/matches/match-table-row';
+import { dateToISOString } from 'csdm/node/database/date-to-iso-string';
 import type { CollateralKillPerMatch } from './fetch-collateral-kill-count-per-match';
 
 export function matchTableRowToMatchTable(
@@ -12,11 +13,11 @@ export function matchTableRowToMatchTable(
     checksum: row.checksum,
     type: row.type,
     game: row.game,
-    analyzeDate: row.analyze_date.toISOString(),
+    analyzeDate: dateToISOString(row.analyze_date),
     assistCount: row.assist_count,
     clientName: row.client_name,
     comment: row.comment ?? '',
-    date: row.date.toISOString(),
+    date: dateToISOString(row.date),
     players: playersPerMatch[row.checksum] ?? [],
     deathCount: row.death_count,
     killCount: row.kill_count,

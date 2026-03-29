@@ -7,12 +7,12 @@ const createMapsTable: Migration = {
     await transaction.schema
       .createTable('maps')
       .ifNotExists()
-      .addColumn('id', 'bigserial', (col) => col.primaryKey().notNull())
+      .addColumn('id', 'integer', (col) => col.primaryKey().notNull())
       .addColumn('name', 'varchar', (col) => col.notNull())
       .addColumn('game', 'varchar', (col) => col.notNull())
       .addColumn('position_x', 'integer', (col) => col.notNull())
       .addColumn('position_y', 'integer', (col) => col.notNull())
-      .addColumn('scale', 'float4', (col) => col.notNull())
+      .addColumn('scale', 'real', (col) => col.notNull())
       .addColumn('threshold_z', 'integer', (col) => {
         return col.notNull().defaultTo(0);
       })

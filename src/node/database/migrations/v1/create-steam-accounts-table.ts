@@ -1,6 +1,7 @@
 import { sql, type ExpressionBuilder } from 'kysely';
 import type { Migration } from '../migration';
 import type { Database } from '../../schema';
+import { sqliteDb } from '../../database';
 
 const createSteamAccountsTable: Migration = {
   schemaVersion: 1,
@@ -11,64 +12,41 @@ const createSteamAccountsTable: Migration = {
       .addColumn('steam_id', 'varchar', (col) => col.primaryKey().notNull())
       .addColumn('name', 'varchar', (col) => col.notNull())
       .addColumn('avatar', 'varchar', (col) => col.notNull())
-      .addColumn('last_ban_date', 'timestamptz')
+      .addColumn('last_ban_date', 'text')
       .addColumn('is_community_banned', 'boolean', (col) => col.notNull())
       .addColumn('has_private_profile', 'boolean', (col) => col.notNull())
       .addColumn('vac_ban_count', 'integer', (col) => col.notNull())
       .addColumn('game_ban_count', 'integer', (col) => col.notNull())
       .addColumn('economy_ban', 'varchar', (col) => col.notNull())
-      .addColumn('creation_date', 'timestamptz')
-      .addColumn('created_at', 'timestamp', (col) => col.notNull().defaultTo(sql`now()`))
-      .addColumn('updated_at', 'timestamp', (col) => col.notNull().defaultTo(sql`now()`))
+      .addColumn('creation_date', 'text')
+      .addColumn('created_at', 'text', (col) => col.notNull().defaultTo(sql`(datetime('now'))`))
+      .addColumn('updated_at', 'text', (col) => col.notNull().defaultTo(sql`(datetime('now'))`))
       .execute();
 
-    // Trigger to delete SteamIDs from the ignored_steam_accounts table when a row is deleted.
-    const cleanupIgnoredSteamAccountsTableFunction = sql`
-    CREATE OR REPLACE FUNCTION cleanup_ignored_steam_accounts_tables()
-    RETURNS trigger
-    LANGUAGE PLPGSQL
-    AS
-    $$
-    BEGIN
-      DELETE FROM ignored_steam_accounts WHERE steam_id = OLD.steam_id;
-      RETURN OLD;
-    END;
-    $$`;
-    await cleanupIgnoredSteamAccountsTableFunction.execute(transaction);
+    // Use sqliteDb.exec() for triggers because Kysely's sql`` splits on semicolons
+    // inside BEGIN...END blocks, which breaks SQLite compound statements.
+    sqliteDb.exec(`
+      CREATE TRIGGER IF NOT EXISTS steam_account_deleted
+      BEFORE DELETE ON steam_accounts
+      FOR EACH ROW
+      BEGIN
+        DELETE FROM ignored_steam_accounts WHERE steam_id = OLD.steam_id;
+      END
+    `);
 
-    const deleteTrigger = sql`
-    CREATE TRIGGER steam_account_deleted
-    BEFORE DELETE
-    ON steam_accounts
-    FOR EACH ROW
-    EXECUTE PROCEDURE cleanup_ignored_steam_accounts_tables();`;
-    await deleteTrigger.execute(transaction);
+    sqliteDb.exec(`
+      CREATE TRIGGER IF NOT EXISTS update_steam_account_updated_at
+      AFTER UPDATE ON steam_accounts
+      FOR EACH ROW
+      BEGIN
+        UPDATE steam_accounts SET updated_at = datetime('now') WHERE steam_id = NEW.steam_id;
+      END
+    `);
 
-    const updateUpdatedAtFunction = sql`
-    CREATE FUNCTION update_updated_at_steam_account()
-    RETURNS TRIGGER
-    LANGUAGE PLPGSQL
-    AS $$
-    BEGIN
-      NEW.updated_at = now();
-      RETURN NEW;
-    END;
-    $$;
-    `;
-    await updateUpdatedAtFunction.execute(transaction);
-
-    const updateTrigger = sql`
-    CREATE TRIGGER update_steam_account_updated_at
-    BEFORE UPDATE
-    ON
-        steam_accounts
-    FOR EACH ROW
-    EXECUTE PROCEDURE update_updated_at_steam_account();`;
-    await updateTrigger.execute(transaction);
+    await sql`DROP VIEW IF EXISTS player_ban_per_match`.execute(transaction);
 
     await transaction.schema
       .createView('player_ban_per_match')
-      .orReplace()
       .as(
         transaction
           .with('match_steam_ids_with_date', (qb) => {

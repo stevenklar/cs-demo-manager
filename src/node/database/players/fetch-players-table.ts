@@ -1,6 +1,7 @@
 import { sql, type Expression, type SqlBool } from 'kysely';
 import type { PlayerTable } from 'csdm/common/types/player-table';
 import { db } from 'csdm/node/database/database';
+import { dateToISOString } from 'csdm/node/database/date-to-iso-string';
 import type { PlayersTableFilter } from './players-table-filter';
 import { BanFilter } from 'csdm/common/types/ban-filter';
 import { fetchPlayersTags } from 'csdm/node/database/tags/fetch-players-tags';
@@ -37,7 +38,7 @@ async function fetchPlayersStats(filter: PlayersTableFilter): Promise<PlayersSta
       'players.steam_id as steamId',
       sum<number>('players.kill_count').as('killCount'),
       sum<number>('players.death_count').as('deathCount'),
-      sql<number>`SUM(players.kill_count)::NUMERIC / NULLIF(SUM(players.death_count), 0)::NUMERIC`.as('killDeathRatio'),
+      sql<number>`CAST(SUM(players.kill_count) AS REAL) / NULLIF(SUM(players.death_count), 0)`.as('killDeathRatio'),
       sum<number>('players.assist_count').as('assistCount'),
       sum<number>('headshot_count').as('headshotCount'),
       sum<number>('three_kill_count').as('threeKillCount'),
@@ -119,8 +120,8 @@ function buildPlayersTable(
         avatar: lastPlayerData.avatar,
         rank: lastPlayerData.rank,
         game: lastPlayerData.game,
-        lastBanDate: lastPlayerData.lastBanDate?.toISOString() ?? null,
-        lastMatchDate: lastPlayerData.lastMatchDate?.toISOString() ?? null,
+        lastBanDate: lastPlayerData.lastBanDate ? dateToISOString(lastPlayerData.lastBanDate) : null,
+        lastMatchDate: lastPlayerData.lastMatchDate ? dateToISOString(lastPlayerData.lastMatchDate) : '',
         isVacBanned: lastPlayerData.vacBanCount ? lastPlayerData.vacBanCount > 0 : false,
         isGameBanned: lastPlayerData.gameBanCount ? lastPlayerData.gameBanCount > 0 : false,
         isCommunityBanned: lastPlayerData.isCommunityBanned ?? false,

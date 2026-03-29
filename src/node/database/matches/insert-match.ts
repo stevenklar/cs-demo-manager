@@ -1,6 +1,5 @@
 import { parseFile } from '@fast-csv/parse';
 import { deleteMatchesByChecksums } from './delete-matches-by-checksums';
-import { getSettings } from 'csdm/node/settings/get-settings';
 import type { ShotTable } from '../shots/shot-table';
 import type { TeamTable } from '../teams/team-table';
 import type { BombPlantedTable } from '../bomb-planted/bomb-planted-table';
@@ -42,11 +41,10 @@ import { db } from '../database';
 import type { DemoSource, DemoType, Game } from 'csdm/common/types/counter-strike';
 import { InvalidMatchDate } from './errors/invalid-match-date';
 
-async function insertShots({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertShots({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_shots.csv');
 
   await insertFromCsv<ShotTable>({
-    databaseSettings,
     csvFilePath,
     tableName: 'shots',
     columns: [
@@ -79,22 +77,20 @@ async function insertShots({ outputFolderPath, demoName, databaseSettings }: Ins
   });
 }
 
-async function insertTeamsFromCsv({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertTeamsFromCsv({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_teams.csv');
 
   await insertFromCsv<TeamTable>({
-    databaseSettings,
     tableName: 'teams',
     csvFilePath,
     columns: ['name', 'letter', 'score', 'score_first_half', 'score_second_half', 'current_side', 'match_checksum'],
   });
 }
 
-async function insertBombsPlantedFromCsv({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertBombsPlantedFromCsv({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_bombs_planted.csv');
 
   await insertFromCsv<BombPlantedTable>({
-    databaseSettings,
     tableName: 'bombs_planted',
     csvFilePath,
     columns: [
@@ -113,11 +109,10 @@ async function insertBombsPlantedFromCsv({ outputFolderPath, demoName, databaseS
   });
 }
 
-async function insertBombsDefuseStartFromCsv({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertBombsDefuseStartFromCsv({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_bombs_defuse_start.csv');
 
   await insertFromCsv<BombDefuseStartTable>({
-    databaseSettings,
     tableName: 'bombs_defuse_start',
     csvFilePath,
     columns: [
@@ -135,11 +130,10 @@ async function insertBombsDefuseStartFromCsv({ outputFolderPath, demoName, datab
   });
 }
 
-async function insertBombsDefusedFromCsv({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertBombsDefusedFromCsv({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_bombs_defused.csv');
 
   await insertFromCsv<BombDefusedTable>({
-    databaseSettings,
     tableName: 'bombs_defused',
     csvFilePath,
     columns: [
@@ -160,11 +154,10 @@ async function insertBombsDefusedFromCsv({ outputFolderPath, demoName, databaseS
   });
 }
 
-async function insertBombsExplodedFromCsv({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertBombsExplodedFromCsv({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_bombs_exploded.csv');
 
   await insertFromCsv<BombExplodedTable>({
-    databaseSettings,
     tableName: 'bombs_exploded',
     csvFilePath,
     columns: [
@@ -183,11 +176,10 @@ async function insertBombsExplodedFromCsv({ outputFolderPath, demoName, database
   });
 }
 
-async function insertBombsPlantStartFromCsv({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertBombsPlantStartFromCsv({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_bombs_plant_start.csv');
 
   await insertFromCsv<BombPlantStartTable>({
-    databaseSettings,
     tableName: 'bombs_plant_start',
     csvFilePath,
     columns: [
@@ -206,11 +198,10 @@ async function insertBombsPlantStartFromCsv({ outputFolderPath, demoName, databa
   });
 }
 
-async function insertPlayers({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertPlayers({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_players.csv');
 
   await insertFromCsv<MatchPlayerTable>({
-    databaseSettings,
     tableName: 'players',
     csvFilePath,
     columns: [
@@ -260,12 +251,11 @@ async function insertPlayers({ outputFolderPath, demoName, databaseSettings }: I
   });
 }
 
-async function insertRounds({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertRounds({ outputFolderPath, demoName }: InsertOptions) {
   try {
     const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_rounds.csv');
 
     await insertFromCsv<RoundTable>({
-      databaseSettings,
       tableName: 'rounds',
       csvFilePath,
       columns: [
@@ -305,11 +295,10 @@ async function insertRounds({ outputFolderPath, demoName, databaseSettings }: In
   }
 }
 
-async function insertDamages({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertDamages({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_damages.csv');
 
   await insertFromCsv<DamageTable>({
-    databaseSettings,
     tableName: 'damages',
     csvFilePath,
     columns: [
@@ -339,11 +328,10 @@ async function insertDamages({ outputFolderPath, demoName, databaseSettings }: I
   });
 }
 
-async function insertPlayersEconomies({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertPlayersEconomies({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_players_economy.csv');
 
   await insertFromCsv<PlayerEconomyTable>({
-    databaseSettings,
     tableName: 'player_economies',
     csvFilePath,
     columns: [
@@ -360,11 +348,10 @@ async function insertPlayersEconomies({ outputFolderPath, demoName, databaseSett
   });
 }
 
-async function insertPlayersBuy({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertPlayersBuy({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_players_buy.csv');
 
   await insertFromCsv<PlayerBuyTable>({
-    databaseSettings,
     tableName: 'player_buys',
     csvFilePath,
     columns: [
@@ -383,11 +370,10 @@ async function insertPlayersBuy({ outputFolderPath, demoName, databaseSettings }
   });
 }
 
-async function insertClutchesFromCsv({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertClutchesFromCsv({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_clutches.csv');
 
   await insertFromCsv<ClutchTable>({
-    databaseSettings,
     tableName: 'clutches',
     csvFilePath,
     columns: [
@@ -406,11 +392,10 @@ async function insertClutchesFromCsv({ outputFolderPath, demoName, databaseSetti
   });
 }
 
-async function insertPlayersFlashedFromCsv({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertPlayersFlashedFromCsv({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_players_flashed.csv');
 
   await insertFromCsv<PlayerBlindTable>({
-    databaseSettings,
     tableName: 'player_blinds',
     csvFilePath,
     columns: [
@@ -431,11 +416,10 @@ async function insertPlayersFlashedFromCsv({ outputFolderPath, demoName, databas
   });
 }
 
-async function insertKillsFromCsv({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertKillsFromCsv({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_kills.csv');
 
   await insertFromCsv<KillTable>({
-    databaseSettings,
     tableName: 'kills',
     csvFilePath,
     columns: [
@@ -486,11 +470,10 @@ async function insertKillsFromCsv({ outputFolderPath, demoName, databaseSettings
   });
 }
 
-async function insertGrenadeBounces({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertGrenadeBounces({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_grenade_bounces.csv');
 
   await insertFromCsv<GrenadeBounceTable>({
-    databaseSettings,
     tableName: 'grenade_bounces',
     csvFilePath,
     columns: [
@@ -517,11 +500,10 @@ async function insertGrenadeBounces({ outputFolderPath, demoName, databaseSettin
   });
 }
 
-async function insertGrenadeProjectilesDestroy({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertGrenadeProjectilesDestroy({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_grenade_projectiles_destroy.csv');
 
   await insertFromCsv<GrenadeProjectileDestroyTable>({
-    databaseSettings,
     tableName: 'grenade_projectiles_destroy',
     csvFilePath,
     columns: [
@@ -548,11 +530,10 @@ async function insertGrenadeProjectilesDestroy({ outputFolderPath, demoName, dat
   });
 }
 
-async function insertDecoysStart({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertDecoysStart({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_decoys_start.csv');
 
   await insertFromCsv<DecoyStartTable>({
-    databaseSettings,
     tableName: 'decoys_start',
     csvFilePath,
     columns: [
@@ -578,11 +559,10 @@ async function insertDecoysStart({ outputFolderPath, demoName, databaseSettings 
   });
 }
 
-async function insertSmokesStart({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertSmokesStart({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_smokes_start.csv');
 
   await insertFromCsv<SmokeStartTable>({
-    databaseSettings,
     tableName: 'smokes_start',
     csvFilePath,
     columns: [
@@ -608,11 +588,10 @@ async function insertSmokesStart({ outputFolderPath, demoName, databaseSettings 
   });
 }
 
-async function insertHeGrenadesExplode({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertHeGrenadesExplode({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_he_grenades_explode.csv');
 
   await insertFromCsv<HeGrenadeExplodeTable>({
-    databaseSettings,
     tableName: 'he_grenades_explode',
     csvFilePath,
     columns: [
@@ -638,11 +617,10 @@ async function insertHeGrenadesExplode({ outputFolderPath, demoName, databaseSet
   });
 }
 
-async function insertFlashbangsExplode({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertFlashbangsExplode({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_flashbangs_explode.csv');
 
   await insertFromCsv<FlashbangExplodeTable>({
-    databaseSettings,
     tableName: 'flashbangs_explode',
     csvFilePath,
     columns: [
@@ -668,11 +646,10 @@ async function insertFlashbangsExplode({ outputFolderPath, demoName, databaseSet
   });
 }
 
-async function insertChatMessages({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertChatMessages({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_chat_messages.csv');
 
   await insertFromCsv<ChatMessageTable>({
-    databaseSettings,
     tableName: 'chat_messages',
     csvFilePath,
     columns: [
@@ -689,11 +666,10 @@ async function insertChatMessages({ outputFolderPath, demoName, databaseSettings
   });
 }
 
-async function insertHostageRescued({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertHostageRescued({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_hostage_rescued.csv');
 
   await insertFromCsv<HostageRescuedTable>({
-    databaseSettings,
     tableName: 'hostage_rescued',
     csvFilePath,
     columns: [
@@ -711,11 +687,10 @@ async function insertHostageRescued({ outputFolderPath, demoName, databaseSettin
   });
 }
 
-async function insertHostagePickUpStart({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertHostagePickUpStart({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_hostage_pick_up_start.csv');
 
   await insertFromCsv<HostagePickUpStartTable>({
-    databaseSettings,
     tableName: 'hostage_pick_up_start',
     csvFilePath,
     columns: [
@@ -733,11 +708,10 @@ async function insertHostagePickUpStart({ outputFolderPath, demoName, databaseSe
   });
 }
 
-async function insertHostagePickedUp({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertHostagePickedUp({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_hostage_picked_up.csv');
 
   await insertFromCsv<HostagePickedUpTable>({
-    databaseSettings,
     tableName: 'hostage_picked_up',
     csvFilePath,
     columns: [
@@ -755,11 +729,10 @@ async function insertHostagePickedUp({ outputFolderPath, demoName, databaseSetti
   });
 }
 
-async function insertChickenDeaths({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertChickenDeaths({ outputFolderPath, demoName }: InsertOptions) {
   const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_chicken_deaths.csv');
 
   await insertFromCsv<ChickenDeathTable>({
-    databaseSettings,
     tableName: 'chicken_deaths',
     csvFilePath,
     columns: ['frame', 'tick', 'round_number', 'killer_steam_id', 'weapon_name', 'match_checksum'],
@@ -813,12 +786,11 @@ async function insertDemoFromCsv({ outputFolderPath, demoName }: InsertOptions) 
   });
 }
 
-async function insertMatchFromCsv({ outputFolderPath, demoName, databaseSettings }: InsertOptions) {
+async function insertMatchFromCsv({ outputFolderPath, demoName }: InsertOptions) {
   try {
     const csvFilePath = getCsvFilePath(outputFolderPath, demoName, '_match.csv');
 
     await insertFromCsv<MatchTable>({
-      databaseSettings,
       tableName: 'matches',
       csvFilePath,
       columns: [
@@ -840,7 +812,7 @@ async function insertMatchFromCsv({ outputFolderPath, demoName, databaseSettings
       ],
     });
   } catch (error) {
-    if (error instanceof Error && error.message.includes('matches_pkey')) {
+    if (error instanceof Error && error.message.includes('UNIQUE constraint failed')) {
       throw new DuplicatedMatchChecksum(error);
     }
 
@@ -851,177 +823,49 @@ async function insertMatchFromCsv({ outputFolderPath, demoName, databaseSettings
 export type InsertMatchParameters = {
   checksum: string;
   demoPath: string;
-  // Folder path where CSV files generated by cs-demo-analyzer on the host machine are located.
   outputFolderPath: string;
 };
 
-/**
- * Matches are inserted into the database from CSV files generated by the demo analyzer CLI.
- * The reason is that inserting data from CSV files is much faster than SQL INSERT statements.
- * A 64 tick demo generates around 600K rows containing players position, it takes only ~6s to insert it from a CSV file.
- *
- * CSVs are inserted using the psql "\copy" command, thus the CLI must be installed on the host machine.
- * It could be possible to insert CSV files from the server side using the "COPY FROM" statement, but in case of a
- * remote database it would require to upload those files.
- */
 export async function insertMatch({ checksum, demoPath, outputFolderPath }: InsertMatchParameters) {
   try {
-    const settings = await getSettings();
-    const { database: databaseSettings } = settings;
     await deleteMatchesByChecksums([checksum]);
 
     const demoName = getDemoNameFromPath(demoPath);
-    await insertDemoFromCsv({
-      databaseSettings,
-      outputFolderPath,
-      demoName,
-    });
-    await insertMatchFromCsv({
-      databaseSettings,
-      outputFolderPath,
-      demoName,
-    });
+    const options: InsertOptions = { outputFolderPath, demoName };
 
-    await Promise.all([
-      insertTeamsFromCsv({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertRounds({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertPlayers({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertKillsFromCsv({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertBombsPlantedFromCsv({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertBombsDefusedFromCsv({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertBombsExplodedFromCsv({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertBombsDefuseStartFromCsv({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertBombsPlantStartFromCsv({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertClutchesFromCsv({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertPlayersFlashedFromCsv({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertPlayersEconomies({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertShots({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertDamages({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertPlayersBuy({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertHostageRescued({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertHostagePickUpStart({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertHostagePickedUp({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertChickenDeaths({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertHeGrenadesExplode({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertSmokesStart({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertDecoysStart({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertFlashbangsExplode({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertGrenadeBounces({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertGrenadeProjectilesDestroy({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertChatMessages({
-        databaseSettings,
-        outputFolderPath,
-        demoName,
-      }),
-      insertMatchPositions({
-        demoName,
-        databaseSettings,
-        outputFolderPath,
-      }),
-    ]);
+    await insertDemoFromCsv(options);
+    await insertMatchFromCsv(options);
+
+    // With SQLite, all inserts are sequential (single-writer) but still fast
+    await insertTeamsFromCsv(options);
+    await insertRounds(options);
+    await insertPlayers(options);
+    await insertKillsFromCsv(options);
+    await insertBombsPlantedFromCsv(options);
+    await insertBombsDefusedFromCsv(options);
+    await insertBombsExplodedFromCsv(options);
+    await insertBombsDefuseStartFromCsv(options);
+    await insertBombsPlantStartFromCsv(options);
+    await insertClutchesFromCsv(options);
+    await insertPlayersFlashedFromCsv(options);
+    await insertPlayersEconomies(options);
+    await insertShots(options);
+    await insertDamages(options);
+    await insertPlayersBuy(options);
+    await insertHostageRescued(options);
+    await insertHostagePickUpStart(options);
+    await insertHostagePickedUp(options);
+    await insertChickenDeaths(options);
+    await insertHeGrenadesExplode(options);
+    await insertSmokesStart(options);
+    await insertDecoysStart(options);
+    await insertFlashbangsExplode(options);
+    await insertGrenadeBounces(options);
+    await insertGrenadeProjectilesDestroy(options);
+    await insertChatMessages(options);
+    await insertMatchPositions(options);
   } catch (error) {
-    // It's not possible to use a transaction since data are inserted with the psql CLI.
-    // Mimic a rollback in case of error by deleting the match we were trying to insert.
+    // Roll back by deleting the match data we were trying to insert.
     await deleteMatchesByChecksums([checksum]);
     throw error;
   } finally {
